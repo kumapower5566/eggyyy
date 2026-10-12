@@ -1051,9 +1051,9 @@
 
   // 前三个蛋：安全为主，偶尔来只小鸡仔或者双黄
   const TABLE_PLAIN = [
-    { upTo: 0.06, kind: "chick", yolks: 1 },
-    { upTo: 0.14, kind: "egg", yolks: 2 },
-    { upTo: 0.24, kind: "bad", yolks: 1 },
+    { upTo: 0.1, kind: "chick", yolks: 1 },
+    { upTo: 0.18, kind: "egg", yolks: 2 },
+    { upTo: 0.28, kind: "bad", yolks: 1 },
     { upTo: 1, kind: "egg", yolks: 1 },
   ];
 
@@ -1067,12 +1067,12 @@
   ];
   // 贪心多打的蛋：黄的层数越往上越稀有，小鸡是另一个不在这条梯子上的结局
   const TABLE_GREEDY = [
-    { upTo: 0.12, kind: "chick", yolks: 1 },
-    { upTo: 0.14, kind: "egg", yolks: 5 },
-    { upTo: 0.19, kind: "egg", yolks: 4 },
-    { upTo: 0.3, kind: "egg", yolks: 3 },
-    { upTo: 0.5, kind: "egg", yolks: 2 },
-    { upTo: 0.58, kind: "bad", yolks: 1 },
+    { upTo: 0.18, kind: "chick", yolks: 1 },
+    { upTo: 0.2, kind: "egg", yolks: 5 },
+    { upTo: 0.25, kind: "egg", yolks: 4 },
+    { upTo: 0.36, kind: "egg", yolks: 3 },
+    { upTo: 0.56, kind: "egg", yolks: 2 },
+    { upTo: 0.64, kind: "bad", yolks: 1 },
     { upTo: 1, kind: "egg", yolks: 1 },
   ];
   // 第五个蛋的保底：前面都没出过特殊，这一个必定有黄
