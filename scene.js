@@ -83,6 +83,7 @@
     toms: [],
     parts: [],
     count: 0,
+    cracks: 0, // 这一盆一共打掉了几个蛋（打出来的鸡也算一个）
     bestYolk: 0,
     chick: false,
     chicks: [],
@@ -982,14 +983,16 @@
         hide(el.alt);
       } else if (S.count >= 3) {
         show(el.act, S.beat ? "开火" : "搅开");
-        if (S.count < 5) show(el.alt, "再来一个");
+        if (S.cracks < 5) show(el.alt, "再来一个");
         else hide(el.alt);
       } else {
-        show(el.act, "敲开");
+        // 篮子空了但还没凑够三个，得再去拿一个（也得占掉五个的额度）
+        const rowHasEgg = S.row.some((e) => e.state === "idle");
+        show(el.act, rowHasEgg ? "敲开" : "再来一个");
         if (S.count >= 1) show(el.alt, S.pleaded ? "……好吧" : "就这样吧");
         else hide(el.alt);
       }
-      el.whisper.textContent = !S.ruined && !S.anim && S.count >= 3 && S.count < 5 ? "（听说有人打出来过一只鸡）" : "";
+      el.whisper.textContent = !S.ruined && !S.anim && S.count >= 3 && S.cracks < 5 ? "（听说有人打出来过一只鸡）" : "";
       return;
     }
 
@@ -1020,6 +1023,7 @@
     S.toms = [];
     S.parts = [];
     S.count = 0;
+    S.cracks = 0;
     S.bestYolk = 0;
     S.special = false;
     S.chick = false;
@@ -1185,6 +1189,7 @@
     S.anim = null;
     a.egg.state = "gone";
     spawnShards(a.from.x, a.from.y, geo.eggR, a.kind.kind === "bad");
+    S.cracks += 1; // 打掉一个就算一个，打出来的是鸡也算
 
     if (a.kind.kind === "bad") {
       S.ruined = true;
@@ -1194,16 +1199,7 @@
     } else if (a.kind.kind === "chick") {
       S.chicks.push({ seed: Math.random() * 100 });
       sfx.chirp();
-      if (S.chicks.length >= 5) {
-        // 五只鸡了，蛋一个没打成
-        S.chick = true;
-        say(CHICK_LINES[4]);
-        later(1, showCard);
-      } else {
-        // 小鸡不算一个蛋，补一颗新鲜的给你接着打
-        if (S.count < 3) S.row.push(egg());
-        say(CHICK_LINES[S.chicks.length - 1]);
-      }
+      say(CHICK_LINES[Math.min(S.chicks.length, 5) - 1]);
     } else {
       S.count += 1;
       if (a.kind.yolks >= 2) {
@@ -1223,6 +1219,13 @@
       say(phraseAfter(a.kind));
     }
     S.pleaded = false;
+
+    // 五个蛋打完了还没凑够三个好蛋：今天做不成了
+    if (S.cracks >= 5 && S.count < 3 && !S.chick) {
+      S.chick = true;
+      say(S.chicks.length >= 5 ? "五只小鸡。今天不吃番茄炒蛋了。" : "蛋不够了。今天不吃番茄炒蛋了。");
+      later(1, showCard);
+    }
     render();
   }
 
@@ -1284,6 +1287,7 @@
     S.ruined = false;
     S.bowl = [];
     S.count = 0;
+    S.cracks = 0;
     S.bestYolk = 0;
     S.special = false;
     S.beat = false;
@@ -1310,9 +1314,9 @@
 
   function assessText() {
     if (S.chick) return S.chicks.length > 1 ? "它们不同意。" : "它不同意。";
-    // 旁边站着鸡的时候，让鸡来表态：一到四只都同意，五只就不同意（见上）
-    if (S.chicks.length === 1) return "它表示同意。";
-    if (S.chicks.length > 1) return "它们都同意。";
+    // 旁边站着鸡的时候，它们就一直在看着你（五只时改成不同意，见上）
+    if (S.chicks.length === 1) return "它在旁边看着。";
+    if (S.chicks.length > 1) return `${["", "", "两", "三", "四", "五"][S.chicks.length]}只都在看。`;
     if (S.bestYolk >= 2) return `最好的那颗是${YOLK_NAME[S.bestYolk]}。`;
     if (S.count <= 2) return "你很可疑。";
     if (S.count === 3) return "很正常。";
@@ -1322,7 +1326,7 @@
 
   function stampText() {
     if (S.chick) return "今天不吃";
-    if (S.chicks.length) return "同意";
+    if (S.chicks.length) return "围观";
     if (S.bestYolk >= 2) return YOLK_NAME[S.bestYolk];
     if (S.count <= 2) return "你很可疑";
     if (S.count >= 5) return "五蛋";
@@ -1464,6 +1468,11 @@
       if (S.ruined) return washBowl();
       if (S.anim) return;
       if (S.count >= 3) return S.beat ? startCook() : startBeat();
+      // 篮子空了但还没凑够三个：再去拿一个（照样占掉五个的额度）
+      if (!S.row.some((e) => e.state === "idle")) {
+        if (S.cracks >= 5) return undefined;
+        S.row.push(egg());
+      }
       if (S.pleaded) {
         S.pleaded = false;
         say("这就对了。");
@@ -1484,7 +1493,7 @@
     sfx.unlock();
     if (S.scene === "crack") {
       if (S.count >= 3) {
-        if (S.count >= 5) return;
+        if (S.cracks >= 5) return;
         S.row.push(egg());
         return startCrack();
       }
@@ -1542,6 +1551,7 @@
     snapshot() {
       return {
         count: S.count,
+        cracks: S.cracks,
         chicks: S.chicks.length,
         bestYolk: S.bestYolk,
         sugar: S.sugar,
