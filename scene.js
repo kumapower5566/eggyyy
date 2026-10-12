@@ -1310,6 +1310,8 @@
 
   function assessText() {
     if (S.chick) return S.chicks.length > 1 ? "它们不同意。" : "它不同意。";
+    // 鸡蛋里出了鸡，这怎么能叫正常
+    if (S.chicks.length) return S.chicks.length === 1 ? "很不正常。" : `很不正常，${S.chicks.length}只。`;
     if (S.bestYolk >= 2) return `最好的那颗是${YOLK_NAME[S.bestYolk]}。`;
     if (S.count <= 2) return "你很可疑。";
     if (S.count === 3) return "很正常。";
@@ -1319,6 +1321,7 @@
 
   function stampText() {
     if (S.chick) return "今天不吃";
+    if (S.chicks.length) return "不正常";
     if (S.bestYolk >= 2) return YOLK_NAME[S.bestYolk];
     if (S.count <= 2) return "你很可疑";
     if (S.count >= 5) return "五蛋";
@@ -1533,6 +1536,18 @@
     setMode(mode) {
       setDemoMode(mode);
       reset();
+    },
+    // 只给验证用：把这一局算出来的文字吐出来，界面上看不到
+    snapshot() {
+      return {
+        count: S.count,
+        chicks: S.chicks.length,
+        bestYolk: S.bestYolk,
+        sugar: S.sugar,
+        chickEnd: S.chick,
+        assess: assessText(),
+        stamp: stampText(),
+      };
     },
   };
 })();
