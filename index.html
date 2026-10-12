@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#F2E4C7" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="description" content="" />
+    <title>eggyyy · 三个蛋起步</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- 撕纸边、纸纹都用滤镜算出来，整个站不依赖任何图片资源 -->
+    <svg class="svg-defs" aria-hidden="true" focusable="false">
+      <filter id="torn">
+        <feTurbulence type="fractalNoise" baseFrequency="0.028 0.05" numOctaves="4" seed="11" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      <filter id="torn-soft">
+        <feTurbulence type="fractalNoise" baseFrequency="0.02 0.04" numOctaves="4" seed="3" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
+
+    <main class="stage">
+      <div class="paper" id="paper">
+        <button id="mute" class="mute" type="button" aria-pressed="false" aria-label="声音开关">声</button>
+        <span class="badge" id="badge" hidden>体验版</span>
+
+        <header class="headline" id="headline">
+          <span class="headline__strip" aria-hidden="true"></span>
+          <span class="tape" aria-hidden="true"></span>
+          <div class="headline__text">
+            <p class="headline__line">我做番茄炒蛋，</p>
+            <p class="headline__line headline__line--strong">三个蛋起步。</p>
+          </div>
+        </header>
+
+        <canvas id="scene" aria-label="一口空的炒锅，旁边整齐放着三颗鸡蛋"></canvas>
+
+        <p class="hint" id="hint" role="status" aria-live="polite"></p>
+
+        <div class="controls">
+          <button id="act" class="btn" type="button">打蛋</button>
+          <button id="alt" class="btn btn--alt" type="button" hidden></button>
+        </div>
+        <p class="whisper" id="whisper"></p>
+
+        <div class="card" id="card" hidden>
+          <img id="cardImg" alt="你的番茄炒蛋成品卡" />
+        </div>
+      </div>
+    </main>
+
+    <script src="./sfx.js"></script>
+    <script src="./scene.js"></script>
+  </body>
+</html>
