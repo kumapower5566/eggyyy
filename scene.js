@@ -1310,8 +1310,9 @@
 
   function assessText() {
     if (S.chick) return S.chicks.length > 1 ? "它们不同意。" : "它不同意。";
-    // 鸡蛋里出了鸡，这怎么能叫正常
-    if (S.chicks.length) return S.chicks.length === 1 ? "很不正常。" : `很不正常，${S.chicks.length}只。`;
+    // 旁边站着鸡的时候，让鸡来表态：一到四只都同意，五只就不同意（见上）
+    if (S.chicks.length === 1) return "它表示同意。";
+    if (S.chicks.length > 1) return "它们都同意。";
     if (S.bestYolk >= 2) return `最好的那颗是${YOLK_NAME[S.bestYolk]}。`;
     if (S.count <= 2) return "你很可疑。";
     if (S.count === 3) return "很正常。";
@@ -1321,7 +1322,7 @@
 
   function stampText() {
     if (S.chick) return "今天不吃";
-    if (S.chicks.length) return "不正常";
+    if (S.chicks.length) return "同意";
     if (S.bestYolk >= 2) return YOLK_NAME[S.bestYolk];
     if (S.count <= 2) return "你很可疑";
     if (S.count >= 5) return "五蛋";
